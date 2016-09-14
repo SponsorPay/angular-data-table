@@ -1562,14 +1562,6 @@ function BodyDirective($timeout){
     },
     scope: true,
     template: `
-      <div 
-        class="progress-linear" 
-        role="progressbar" 
-        ng-show="body.options.paging.loadingIndicator">
-        <div class="container">
-          <div class="bar"></div>
-        </div>
-      </div>
       <div class="dt-body" ng-style="body.styles()" dt-seletion>
         <dt-scroller class="dt-body-scroller">
           <dt-group-row ng-repeat-start="r in body.tempRows track by $index"
@@ -1600,16 +1592,7 @@ function BodyDirective($timeout){
                   expanded="body.getRowExpanded(r)"
                   ng-style="body.rowStyles(r)">
           </dt-row>
-        </dt-scroller>
-        <div ng-if="body.rows && !body.rows.length" 
-             class="empty-row" 
-             ng-bind="::body.options.emptyMessage">
-       </div>
-       <div ng-if="body.rows === undefined" 
-             class="loading-row"
-             ng-bind="::body.options.loadingMessage">
-        </div>
-      </div>`
+        </dt-scroller>`
   };
 }
 
