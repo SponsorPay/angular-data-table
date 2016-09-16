@@ -28,11 +28,6 @@
   line-height: 1.625;
   text-overflow: ellipsis;
   touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
 }
 .dt .dt-row,
 .dt .dt-header-inner {
