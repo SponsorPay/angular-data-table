@@ -15,6 +15,7 @@ export function DataTableDirective($window, $timeout, $parse){
       rows: '=',
       selected: '=?',
       expanded: '=?',
+      dtableVisible: '=?',
       onSelect: '&',
       onSort: '&',
       onTreeToggle: '&',
@@ -80,6 +81,7 @@ export function DataTableDirective($window, $timeout, $parse){
            * Invoked on init of control or when the window is resized;
            */
           function resize() {
+            // console.log('resize');
             var rect = $elm[0].getBoundingClientRect();
 
             ctrl.options.internal.innerWidth = Math.floor(rect.width);
@@ -104,20 +106,36 @@ export function DataTableDirective($window, $timeout, $parse){
 
           $window.addEventListener('resize',
             throttle(() => {
-              $timeout(resize);
-            }));
+              $timeout(resizeIfVisible, 100);
+            }, parseInt(tAttrs.resizeThrottle, 10) || 200));
 
           // When an item is hidden for example
           // in a tab with display none, the height
           // is not calculated correrctly.  We need to watch
           // the visible attribute and resize if this occurs
-          var checkVisibility = function() {
-          var bounds = $elm[0].getBoundingClientRect(),
+          var resizeIfVisible = function () {
+            // console.log('resizeIfVisible');
+            var bounds = $elm[0].getBoundingClientRect(),
               visible = bounds.width && bounds.height;
-            if (visible) resize();
-            else $timeout(checkVisibility, 100);
+            if (visible) {
+              resize();
+            }
+            return visible;
           };
-          checkVisibility();
+
+          // var checkVisibility = function () {
+          //   if(!resizeIfVisible()) {
+          //     $timeout(checkVisibility, 100);
+          //   }
+          // };
+          resizeIfVisible();
+
+          $scope.$watch('dt.dtableVisible', (newVal, oldVal) => {
+            if(newVal !== oldVal && newVal){
+              // console.log('dt.dtableVisible');
+              $timeout(resizeIfVisible, 100);
+            }
+          });
 
           // add a loaded class to avoid flickering
           $elm.addClass('dt-loaded');
