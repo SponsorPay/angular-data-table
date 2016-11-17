@@ -1,6 +1,6 @@
 /**
  * angular-data-table - A feature-rich but lightweight ES6 AngularJS Data Table crafted for large data sets!
- * @version v0.7.2
+ * @version v0.7.3
  * @link http://swimlane.com/
  * @license 
  */
@@ -957,7 +957,7 @@ var BodyController = function () {
   }, {
     key: "calculateDepth",
     value: function calculateDepth(row) {
-      var depth = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+      var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
       var parentProp = this.treeColumn ? this.treeColumn.relationProp : this.groupColumn.prop;
       var prop = this.treeColumn.prop;
@@ -2317,6 +2317,7 @@ function DataTableDirective($window, $timeout, $parse) {
       rows: '=',
       selected: '=?',
       expanded: '=?',
+      dtableVisible: '=?',
       onSelect: '&',
       onSort: '&',
       onTreeToggle: '&',
@@ -2371,15 +2372,25 @@ function DataTableDirective($window, $timeout, $parse) {
           };
 
           $window.addEventListener('resize', throttle(function () {
-            $timeout(resize);
-          }));
+            $timeout(resizeIfVisible, 100);
+          }, parseInt(tAttrs.resizeThrottle, 10) || 200));
 
-          var checkVisibility = function checkVisibility() {
+          var resizeIfVisible = function resizeIfVisible() {
             var bounds = $elm[0].getBoundingClientRect(),
                 visible = bounds.width && bounds.height;
-            if (visible) resize();else $timeout(checkVisibility, 100);
+            if (visible) {
+              resize();
+            }
+            return visible;
           };
-          checkVisibility();
+
+          resizeIfVisible();
+
+          $scope.$watch('dt.dtableVisible', function (newVal, oldVal) {
+            if (newVal !== oldVal && newVal) {
+              $timeout(resizeIfVisible, 100);
+            }
+          });
 
           $elm.addClass('dt-loaded');
 
